@@ -7,9 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////// 	 
 //如果使用ucos,则包括下面的头文件即可.
 #if SYSTEM_SUPPORT_OS
-#include "includes.h"					//ucos 使用	  
+	#if OS_FREE_RTOS
+		#include "FreeRTOS.h"
+		#include "task.h"					//freertos 使用	  
+	#elif OS_UCOS
+		#include "includes.h"					//ucos 使用	  
+	#endif
 #endif
-
 
 //////////////////////////////////////////////////////////////////
 //加入以下代码,支持printf函数,而不需要选择use MicroLIB	  

@@ -1534,9 +1534,9 @@ void instance_close(void)
     //wake up device from low power mode
     //NOTE - in the ARM  code just drop chip select for 200us
     port_SPIx_clear_chip_select();  //CS low
-    Sleep(1);   //200 us to wake up then waits 5ms for DW1000 XTAL to stabilise
+    delay_ms(1);   //200 us to wake up then waits 5ms for DW1000 XTAL to stabilise
     port_SPIx_set_chip_select();  //CS high
-    Sleep(5);
+    delay_ms(5);
     dwt_entersleepaftertx(0); // clear the "enter deep sleep after tx" bit
 
     dwt_setinterrupt(0xFFFFFFFF, 0); //don't allow any interrupts

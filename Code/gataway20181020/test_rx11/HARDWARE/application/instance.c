@@ -237,9 +237,9 @@ int testapprun(instance_data_t *inst, int message)
 
                 setup_DW1000RSTnIRQ(1); //enable RSTn IRQ
 
-                Sleep(2);   //200 us to wake up - need 2 as Sleep(1) is ~ 175 us
+                delay_ms(2);   //200 us to wake up - need 2 as delay_ms(1) is ~ 175 us
                 //then wait 5ms for DW1000 XTAL to stabilise - instead of wait we wait for RSTn to go high
-                //Sleep(5);
+                //delay_ms(5);
 
                 //need to poll to check when the DW1000 is in IDLE, the CPLL interrupt is not reliable
                 //when RSTn goes high the DW1000 is in INIT, it will enter IDLE after PLL lock (in 5 us)
@@ -274,7 +274,7 @@ int testapprun(instance_data_t *inst, int message)
 				dwt_seteui(inst->eui64);
             }
 #else
-            Sleep(3); //to approximate match the time spent in the #if above
+            delay_ms(3); //to approximate match the time spent in the #if above
 #endif
 
             instancesetantennadelays(); //this will update the antenna delay if it has changed

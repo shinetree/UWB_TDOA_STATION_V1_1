@@ -33,7 +33,7 @@
 #include "usb_desc.h"
 #include "hw_config.h"
 #include "usb_pwr.h"
-#include "Queue.h"
+#include "queue_user.h"
 
 
 /* Private typedef -----------------------------------------------------------*/

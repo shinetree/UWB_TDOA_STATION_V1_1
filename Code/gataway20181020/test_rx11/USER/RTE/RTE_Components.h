@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'SPI' 
+ * Project: 'UWB_STATION_V1_1' 
  * Target:  'TREK1000' 
  */
 

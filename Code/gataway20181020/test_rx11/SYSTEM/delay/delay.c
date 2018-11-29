@@ -3,8 +3,12 @@
 ////////////////////////////////////////////////////////////////////////////////// 	 
 //如果需要使用OS,则包括下面的头文件即可.
 #if SYSTEM_SUPPORT_OS
-#include "includes.h"					//ucos 使用
-
+	#if OS_FREE_RTOS
+		#include "FreeRTOS.h"
+		#include "task.h"					//freertos 使用	  
+	#elif OS_UCOS
+		#include "includes.h"					//ucos 使用	  
+	#endif
 #endif
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
@@ -44,10 +48,9 @@
 //delay_tickspersec改为：delay_ostickspersec
 //delay_intnesting改为：delay_osintnesting
 //////////////////////////////////////////////////////////////////////////////////  
-
 static u8  fac_us=0;							//us延时倍乘数			   
 static u16 fac_ms=0;							//ms延时倍乘数,在ucos下,代表每个节拍的ms数
-	
+
 	
 #if SYSTEM_SUPPORT_OS							//如果SYSTEM_SUPPORT_OS定义了,说明要支持OS了(不限于UCOS).
 //当delay_us/delay_ms需要支持OS的时候需要三个与OS相关的宏定义和函数来支持
@@ -79,37 +82,50 @@ static u16 fac_ms=0;							//ms延时倍乘数,在ucos下,代表每个节拍的ms数
 //us级延时时,关闭任务调度(防止打断us级延迟)
 void delay_osschedlock(void)
 {
-#ifdef CPU_CFG_CRITICAL_METHOD   				//使用UCOSIII
-	OS_ERR err; 
-	OSSchedLock(&err);							//UCOSIII的方式,禁止调度，防止打断us延时
-#else											//否则UCOSII
-	OSSchedLock();								//UCOSII的方式,禁止调度，防止打断us延时
-#endif
+	
+	#if OS_FREE_RTOS
+		vTaskSuspendAll(); 
+	#elif OS_UCOS
+		#ifdef CPU_CFG_CRITICAL_METHOD   				//使用UCOSIII
+			OS_ERR err; 
+			OSSchedLock(&err);							//UCOSIII的方式,禁止调度，防止打断us延时
+		#else											//否则UCOSII
+			OSSchedLock();								//UCOSII的方式,禁止调度，防止打断us延时
+		#endif
+	#endif
 }
 
 //us级延时时,恢复任务调度
 void delay_osschedunlock(void)
 {	
-#ifdef CPU_CFG_CRITICAL_METHOD   				//使用UCOSIII
-	OS_ERR err; 
-	OSSchedUnlock(&err);						//UCOSIII的方式,恢复调度
-#else											//否则UCOSII
-	OSSchedUnlock();							//UCOSII的方式,恢复调度
-#endif
+	#if OS_FREE_RTOS
+		xTaskResumeAll(); 
+	#elif OS_UCOS
+		#ifdef CPU_CFG_CRITICAL_METHOD   				//使用UCOSIII
+			OS_ERR err; 
+			OSSchedUnlock(&err);						//UCOSIII的方式,恢复调度
+		#else											//否则UCOSII
+			OSSchedUnlock();							//UCOSII的方式,恢复调度
+		#endif
+	#endif
 }
 
 //调用OS自带的延时函数延时
 //ticks:延时的节拍数
 void delay_ostimedly(u32 ticks)
 {
-#ifdef CPU_CFG_CRITICAL_METHOD
-	OS_ERR err; 
-	OSTimeDly(ticks,OS_OPT_TIME_PERIODIC,&err);	//UCOSIII延时采用周期模式
-#else
-	OSTimeDly(ticks);							//UCOSII延时
-#endif 
+	#if OS_FREE_RTOS
+		vTaskDelay(ticks); 
+	#elif OS_UCOS
+		#ifdef CPU_CFG_CRITICAL_METHOD
+			OS_ERR err; 
+			OSTimeDly(ticks,OS_OPT_TIME_PERIODIC,&err);	//UCOSIII延时采用周期模式
+		#else
+			OSTimeDly(ticks);							//UCOSII延时
+		#endif 
+	#endif
 }
- 
+#if OS_UCOS 
 //systick中断服务函数,使用ucos时用到
 void SysTick_Handler(void)
 {	
@@ -121,6 +137,7 @@ void SysTick_Handler(void)
 	}
 }
 #endif
+#endif
 
 			   
 //初始化延迟函数
@@ -129,27 +146,24 @@ void SysTick_Handler(void)
 //SYSCLK:系统时钟
 void delay_init()
 {
-#if SYSTEM_SUPPORT_OS  							//如果需要支持OS.
-	u32 reload;
-#endif
-	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);	//选择外部时钟  HCLK/8
 	fac_us=SystemCoreClock/8000000;				//为系统时钟的1/8  
-#if SYSTEM_SUPPORT_OS  							//如果需要支持OS.
-	reload=SystemCoreClock/8000000;				//每秒钟的计数次数 单位为M  
-	reload*=1000000/delay_ostickspersec;		//根据delay_ostickspersec设定溢出时间
-												//reload为24位寄存器,最大值:16777216,在72M下,约合1.86s左右	
-	fac_ms=1000/delay_ostickspersec;			//代表OS可以延时的最少单位	   
-
-	SysTick->CTRL|=SysTick_CTRL_TICKINT_Msk;   	//开启SYSTICK中断
-	SysTick->LOAD=reload; 						//每1/delay_ostickspersec秒中断一次	
-	SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk;   	//开启SYSTICK    
-
-#else
 	fac_ms=(u16)fac_us*1000;					//非OS下,代表每个ms需要的systick时钟数  
+#if SYSTEM_SUPPORT_OS  							//如果需要支持OS.
+	#if OS_UCOS
+		u32 reload;
+		SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);	//选择外部时钟  HCLK/8
+		reload=SystemCoreClock/8000000;				//每秒钟的计数次数 单位为M  
+		reload*=1000000/delay_ostickspersec;		//根据delay_ostickspersec设定溢出时间
+													//reload为24位寄存器,最大值:16777216,在72M下,约合1.86s左右	
+		fac_ms=1000/delay_ostickspersec;			//代表OS可以延时的最少单位	   
+
+		SysTick->CTRL|=SysTick_CTRL_TICKINT_Msk;   	//开启SYSTICK中断
+		SysTick->LOAD=reload; 						//每1/delay_ostickspersec秒中断一次	
+		SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk;   	//开启SYSTICK    
+	#endif
 //	NVIC_SetPriority (SysTick_IRQn, 5);	
 #endif
 }								    
-
 #if SYSTEM_SUPPORT_OS  							//如果需要支持OS.
 //延时nus
 //nus为要延时的us数.		    								   
@@ -179,14 +193,14 @@ void delay_us(u32 nus)
 //nms:要延时的ms数
 void delay_ms(u16 nms)
 {	
-	if(delay_osrunning&&delay_osintnesting==0)	//如果OS已经在跑了,并且不是在中断里面(中断里面不能任务调度)	    
-	{		 
-		if(nms>=fac_ms)							//延时的时间大于OS的最少时间周期 
-		{ 
-   			delay_ostimedly(nms/fac_ms);		//OS延时
-		}
-		nms%=fac_ms;							//OS已经无法提供这么小的延时了,采用普通方式延时    
-	}
+//	if(delay_osrunning&&delay_osintnesting==0)	//如果OS已经在跑了,并且不是在中断里面(中断里面不能任务调度)	    
+//	{		 
+//		if(nms>=fac_ms)							//延时的时间大于OS的最少时间周期 
+//		{ 
+//   			delay_ostimedly(nms/fac_ms);		//OS延时
+//		}
+//		nms%=fac_ms;							//OS已经无法提供这么小的延时了,采用普通方式延时    
+//	}
 	delay_us((u32)(nms*1000));					//普通方式延时  
 }
 #else //不用OS时
@@ -233,43 +247,3 @@ void Sleep(unsigned int time_ms)
 }
 
 #endif 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -35,6 +35,7 @@ int SysTick_Configuration(void)
 		/* Capture error */
 		while (1);
 	}
+    SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
 	NVIC_SetPriority (SysTick_IRQn, 5);
 
 	return 0;
@@ -78,7 +79,7 @@ int NVIC_Configuration(void)
 	EXTI_Init(&EXTI_InitStructure);
 
 	/* Set NVIC Grouping to 16 groups of interrupt without sub-grouping */
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 	/* Enable and set EXTI Interrupt to the lowest priority */
 	NVIC_InitStructure.NVIC_IRQChannel = DECAIRQ_EXTI_IRQn;
@@ -328,7 +329,7 @@ void reset_DW1000(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(DW1000_RSTn_GPIO, &GPIO_InitStructure);
 
-	Sleep(2);
+	delay_ms(2);
 }
 
 

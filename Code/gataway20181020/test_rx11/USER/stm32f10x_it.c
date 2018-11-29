@@ -63,22 +63,22 @@ void UsageFault_Handler(void)
   }
 }
  
-void SVC_Handler(void)
-{
-}
+//void SVC_Handler(void)
+//{
+//}
  
 void DebugMon_Handler(void)
 {
 }
  
-void PendSV_Handler(void)
-{
-}
+//void PendSV_Handler(void)
+//{
+//}
  
-void SysTick_Handler(void)
-{
-		time32_incr++;
-}
+//void SysTick_Handler(void)
+//{
+//		time32_incr++;
+//}
 
 void EXTI15_10_IRQHandler(void)
 {

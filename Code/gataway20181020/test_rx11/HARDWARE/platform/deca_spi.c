@@ -212,6 +212,6 @@ int readfromspi_serial
 //    port_SPIy_set_chip_select();  //CS high
 
 //    if(sleep)
-//    	Sleep(2);
+//    	delay_ms(2);
 //} // end writetoLCD()
 //#endif

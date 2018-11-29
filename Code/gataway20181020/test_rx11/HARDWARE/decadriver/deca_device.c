@@ -1640,7 +1640,7 @@ uint32 _dwt_otpsetmrregs(int mode)
     dwt_writetodevice(OTP_IF_ID, OTP_CTRL,1,wr_buf);
 
     // Wait?
-    Sleep(10);
+    delay_ms(10);
     // Set Clear Mode sel
     wr_buf[0] = 0x00;
     dwt_writetodevice(OTP_IF_ID,OTP_CTRL+1,1,wr_buf);
@@ -1654,7 +1654,7 @@ uint32 _dwt_otpsetmrregs(int mode)
     //MRB_SEL
     wr_buf[0] = 0x04;
     dwt_writetodevice(OTP_IF_ID,OTP_CTRL+1,1,wr_buf);
-    Sleep(100);
+    delay_ms(100);
 
     // Clear mode sel
     wr_buf[0] = 0x00;
@@ -1663,7 +1663,7 @@ uint32 _dwt_otpsetmrregs(int mode)
     wr_buf[0] = 0x00;
     dwt_writetodevice(OTP_IF_ID, OTP_CTRL,1,wr_buf);
 
-    Sleep(10);
+    delay_ms(10);
 
     if (((mode&0x0f) == 0x1)||((mode&0x0f) == 0x2))
 	{
@@ -1715,7 +1715,7 @@ uint32 _dwt_otpprogword32(uint32 data, uint16 address)
     otp_done = 0;
     while(otp_done == 0)
     {
-		Sleep(1);
+		delay_ms(1);
         dwt_readfromdevice(OTP_IF_ID, OTP_STAT, 1, rd_buf);
 
         if((rd_buf[0] & 0x01) == 0x01)
@@ -1907,7 +1907,7 @@ uint16 dwt_calibratesleepcnt(void)
 
     buf[0] = 0x01;
     dwt_writetodevice(PMSC_ID,PMSC_CTRL0_OFFSET,1,buf);
-    Sleep(1);
+    delay_ms(1);
 
     //read the number of XTAL/2 cycles one lposc cycle took.
     // Set up address
@@ -2057,7 +2057,7 @@ int dwt_spicswakeup(uint8 *buff, uint16 length)
 
         //need 5ms for XTAL to start and stabilise (could wait for PLL lock IRQ status bit !!!)
         //NOTE: Polling of the STATUS register is not possible unless freq is < 3MHz
-        Sleep(5);
+        delay_ms(5);
     }
     else
     {
@@ -2124,7 +2124,7 @@ int _dwt_loaducodefromrom(void)
     //kick off the LDE load
     dwt_write16bitoffsetreg(OTP_IF_ID, OTP_CTRL, OTP_CTRL_LDELOAD); // set load LDE kick bit
 
-    Sleep(1); // Allow time for code to upload (should take up to 120 us)
+    delay_ms(1); // Allow time for code to upload (should take up to 120 us)
 
     //default clocks (ENABLE_ALL_SEQ)
     _dwt_enableclocks(ENABLE_ALL_SEQ); //enable clocks for sequencing
@@ -3316,7 +3316,7 @@ void dwt_softreset(void)
     dwt_writetodevice(PMSC_ID, 0x3, 1, &temp[0]) ;
 
     //DW1000 needs a 10us sleep to let clk PLL lock after reset - the PLL will automatically lock after the reset
-    Sleep(1);
+    delay_ms(1);
     //Can also poll the PLL lock flag, but then the SPI needs to be < 3MHz !!
 
     temp[0] |= 0xF0;
@@ -3509,7 +3509,7 @@ uint16 dwt_readtempvbat(uint8 fastSPI)
 
     if(fastSPI == 1)
     {
-    	Sleep(1); //if using PLL clocks(and fast SPI rate) then this Sleep is needed
+    	delay_ms(1); //if using PLL clocks(and fast SPI rate) then this Sleep is needed
     	//read voltage and temperature.
    		dwt_readfromdevice(TX_CAL_ID, TC_SARL_SAR_LVBAT_OFFSET,2,wr_buf);
     }

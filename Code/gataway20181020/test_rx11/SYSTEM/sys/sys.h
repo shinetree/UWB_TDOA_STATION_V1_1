@@ -15,7 +15,9 @@
 
 //0,不支持ucos
 //1,支持ucos
-#define SYSTEM_SUPPORT_OS		0		//定义系统文件夹是否支持UCOS
+#define SYSTEM_SUPPORT_OS		1		//定义系统文件夹是否支持RTOS系统
+#define OS_FREE_RTOS  			1		//使用FREERTOS											    
+#define OS_UCOS 			      0		//使用UCOS												    
 																	    
 	 
 //位带操作,实现51类似的GPIO控制功能

@@ -2,3 +2,7 @@ Code/gataway20181020/test_rx11/OBJ/
 Code/gataway20181020/test_rx11/USER/SPI.uvoptx
 Code/gataway20181020/test_rx11/USER/test.map
 Code/gataway20181020/test_rx11/USER/startup_stm32f10x_hd.lst
+Code/OBJ/
+*.map
+Code/USER/UWB_STATION_V1_1.uvguix.Carlvin.Li
+*.uvoptx

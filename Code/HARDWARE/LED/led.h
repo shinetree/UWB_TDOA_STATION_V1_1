@@ -3,10 +3,8 @@
 #include "sys.h"
 typedef enum
 {
-    LED_PC6,
-    LED_PC7,
-    LED_PC8,
-    LED_PC9,
+    LED_1,
+    LED_2,
     LED_ALL,
     LEDn
 } led_t;

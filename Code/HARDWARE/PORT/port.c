@@ -87,10 +87,6 @@ int NVIC_Configuration(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = DECAIRQ_EXTI_USEIRQ;
 
-	NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;				//设置中断向量号
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;	//设置抢先优先级
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;			//设置响应优先级
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;				//使能NVIC
 
 
 	NVIC_Init(&NVIC_InitStructure);

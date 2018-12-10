@@ -231,7 +231,7 @@ int testapprun(instance_data_t *inst, int message)
                 
                 //wake up device from low power mode
                 //NOTE - in the ARM  code just drop chip select for 200us
-            	led_on(LED_PC9);
+            	led_on(LED_1);
                 port_SPIx_clear_chip_select();  //CS low
                 instance_data[0].dwIDLE = 0; //reset DW1000 IDLE flag
 
@@ -263,7 +263,7 @@ int testapprun(instance_data_t *inst, int message)
                 {
                 	x = dwt_readdevid(); //dummy read... need to wait for 5 us to exit INIT state (5 SPI bytes @ ~18 MHz)
                 }*/
-                led_off(LED_PC9);
+                led_off(LED_1);
                 //this is platform dependent - only program if DW EVK/EVB
                 dwt_setleds(1);
 

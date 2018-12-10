@@ -726,13 +726,13 @@ void ancenablerx(void)
 	if(dwt_rxenable(DWT_START_RX_DELAYED)) //delayed rx
 	{
 		//if the delayed RX failed - time has passed - do immediate enable
-		//led_on(LED_PC9);
+		//led_on(LED_1);
 		dwt_setrxtimeout((uint16)instance_data[instance].fwtoTimeAnc_sy*2); //reconfigure the timeout before enable
 		//longer timeout as we cannot do delayed receive... so receiver needs to stay on for longer
 		dwt_rxenable(DWT_START_RX_IMMEDIATE);
 		dwt_setrxtimeout((uint16)instance_data[instance].fwtoTimeAnc_sy); //restore the timeout for next RX enable
 		instance_data[instance].lateRX++;
-		//led_off(LED_PC9);
+		//led_off(LED_1);
 	}
 
 }
@@ -780,7 +780,7 @@ uint8 anctxorrxreenable(uint16 sourceAddress, int ancToAncTWR)
 	if((((ancToAncTWR & 1) == 0) && ((instance_data[instance].responseTO + instance_data[instance].shortAdd_idx) == NUM_EXPECTED_RESPONSES)) //it's our turn to tx
 		|| (sendResp == 1))
 	{
-		//led_on(LED_PC9);
+		//led_on(LED_1);
 		//response is expected
 		instance_data[instance].wait4ack = DWT_RESPONSE_EXPECTED; //re has/will be re-enabled
 
@@ -802,7 +802,7 @@ uint8 anctxorrxreenable(uint16 sourceAddress, int ancToAncTWR)
 			instance_data[instance].timeofTx = portGetTickCnt();
 			instance_data[instance].monitor = 1;
 		}
-		//led_off(LED_PC9);
+		//led_off(LED_1);
 	}
 	else //stay in receive
 	{
@@ -813,9 +813,9 @@ uint8 anctxorrxreenable(uint16 sourceAddress, int ancToAncTWR)
 		}
 		else
 		{
-			//led_on(LED_PC9);
+			//led_on(LED_1);
 			ancenablerx();
-			//led_off(LED_PC9);
+			//led_off(LED_1);
 		}
 
 		type_pend = DWT_SIG_RX_PENDING ;
@@ -1084,7 +1084,7 @@ void instance_rxcallback(const dwt_callback_data_t *rxd)
 																+ (((sourceAddress&0x3) + 8) << 4));
 						instance_data[instance].rxResps[instance_data[instance].rxRespsIdx] = 0;
 						//debug LED on
-						led_on(LED_PC9);
+						led_on(LED_1);
 
 						//prepare the response and write it to the tx buffer
 						ancprepareresponse2(sourceAddress, srcAddr_index, fcode_index, &dw_event.msgu.frame[0]);
@@ -1103,7 +1103,7 @@ void instance_rxcallback(const dwt_callback_data_t *rxd)
 
 						instance_data[instance].tofAnc[sourceAddress & 0x3] = INVALID_TOF; //clear ToF ..
 						//debug LED off
-						led_off(LED_PC9);
+						led_off(LED_1);
 						break;
 					}
 
@@ -1121,7 +1121,7 @@ void instance_rxcallback(const dwt_callback_data_t *rxd)
 																+ ((sourceAddress&0x7) << 4));
 						instance_data[instance].rxResps[instance_data[instance].rxRespsIdx] = 0;
 						//debug LED on
-						led_on(LED_PC9);
+						led_on(LED_1);
 						//prepare the response and write it to the tx buffer
 						ancprepareresponse(sourceAddress, srcAddr_index, fcode_index, &dw_event.msgu.frame[0], dw_event.uTimeStamp);
 
@@ -1134,7 +1134,7 @@ void instance_rxcallback(const dwt_callback_data_t *rxd)
 
 						instance_data[instance].tof[sourceAddress & 0x7] = INVALID_TOF; //clear ToF ..
 						//debug LED off
-						led_off(LED_PC9);
+						led_off(LED_1);
 					}
 					break;
 
@@ -1182,12 +1182,12 @@ void instance_rxcallback(const dwt_callback_data_t *rxd)
 								}
 								else //like a timeout (error) ...
 								{
-									led_on(LED_PC9);
+									led_on(LED_1);
 									//send a response or re-enable rx
 									dwt_setrxtimeout(0); //reconfigure the timeout
 									dwt_rxenable(DWT_START_RX_IMMEDIATE) ;
 									dw_event.type_pend = DWT_SIG_RX_PENDING ;
-									led_off(LED_PC9);
+									led_off(LED_1);
 								}
 							}
 							else //in anchor mode and got RTLS_DEMO_MSG_ANCH_RESP2
@@ -1280,9 +1280,9 @@ void instance_rxcallback(const dwt_callback_data_t *rxd)
 	}
 	else //assume other events are errors
 	{
-		//led_on(LED_PC9);
+		//led_on(LED_1);
 		handle_error_unknownframe(dw_event);
-		//led_off(LED_PC9);
+		//led_off(LED_1);
 	}
 }
 
